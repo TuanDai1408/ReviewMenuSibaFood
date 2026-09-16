@@ -1,0 +1,6 @@
+{
+  "name": "Khảo Sát Thực Đơn Bán Trú - SIBA",
+  "description": "Hệ thống khảo sát ý kiến thực đơn bán trú học đường theo từng điểm trường thuộc Công ty Cổ phần Cơm Ngon SIBA.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
