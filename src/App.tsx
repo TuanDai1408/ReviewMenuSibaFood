@@ -12,13 +12,16 @@ import {
   Phone,
   Mail,
   ShieldCheck,
-  ChevronDown
+  ChevronDown,
+  Database,
+  Loader2
 } from 'lucide-react';
 import { HeaderBanner } from './components/HeaderBanner';
 import { GeneralInfoStep } from './components/GeneralInfoStep';
 import { WeeklyMenuTable } from './components/WeeklyMenuTable';
 import { DayFeedbackCard } from './components/DayFeedbackCard';
 import { SuccessView } from './components/SuccessView';
+import { AdminSubmissionsModal } from './components/AdminSubmissionsModal';
 import { 
   SCHOOLS_LIST, 
   COMPANY_INFO, 
@@ -26,6 +29,7 @@ import {
   getGroupName 
 } from './data/schoolsAndMenus';
 import { DayFeedback, OpinionType, SurveySubmission } from './types';
+import { sendSubmissionToWebhook } from './services/submissionService';
 
 export default function App() {
   // Form State
@@ -46,9 +50,11 @@ export default function App() {
 
   const [generalFeedback, setGeneralFeedback] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionData, setSubmissionData] = useState<SurveySubmission | null>(null);
   const [validationError, setValidationError] = useState('');
   const [showTableModal, setShowTableModal] = useState(false);
+  const [showAdminModal, setShowAdminModal] = useState(false);
 
   // Selected School & Dynamic Menu
   const selectedSchool = useMemo(() => {
@@ -113,7 +119,7 @@ export default function App() {
   };
 
   // Submit Handler
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!selectedSchoolId) {
@@ -140,6 +146,7 @@ export default function App() {
     }
 
     setValidationError('');
+    setIsSubmitting(true);
 
     const newSubmission: SurveySubmission = {
       id: `SIBA-${Date.now()}`,
@@ -161,11 +168,18 @@ export default function App() {
       generalFeedback: generalFeedback.trim(),
     };
 
-    setSubmissionData(newSubmission);
-    setIsSubmitted(true);
-
-    // Scroll smoothly to top
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    try {
+      // Save locally and send to Google Sheets webhook if configured
+      await sendSubmissionToWebhook(newSubmission);
+    } catch (error) {
+      console.warn('Submission persistence warning:', error);
+    } finally {
+      setIsSubmitting(false);
+      setSubmissionData(newSubmission);
+      setIsSubmitted(true);
+      // Scroll smoothly to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const handleReset = () => {
@@ -349,10 +363,20 @@ export default function App() {
                 <button
                   id="button-submit-survey"
                   type="submit"
-                  className="w-full sm:w-auto px-8 py-3.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-sm sm:text-base rounded-xl shadow-lg shadow-emerald-200 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2.5 cursor-pointer"
+                  disabled={isSubmitting}
+                  className="w-full sm:w-auto px-8 py-3.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 disabled:opacity-75 text-white font-bold text-sm sm:text-base rounded-xl shadow-lg shadow-emerald-200 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2.5 cursor-pointer"
                 >
-                  <span>Gửi Phiếu Đánh Giá</span>
-                  <Send className="w-4 h-4" />
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Đang lưu phiếu...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Gửi Phiếu Đánh Giá</span>
+                      <Send className="w-4 h-4" />
+                    </>
+                  )}
                 </button>
               </div>
             </form>
@@ -368,14 +392,31 @@ export default function App() {
             <MapPin className="w-3.5 h-3.5 text-slate-400" />
             <span>Trụ sở: {COMPANY_INFO.headquarters}</span>
           </p>
-          <div className="flex items-center justify-center gap-4 text-slate-500 pt-1">
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 text-slate-500 pt-1">
             <span>Hotline hỗ trợ: {COMPANY_INFO.hotline}</span>
             <span>•</span>
             <span>Email: {COMPANY_INFO.email}</span>
             <span>•</span>
             <span>Bản quyền © 2026 SIBA Bán Trú Học Đường</span>
           </div>
+
+          {/* Admin / Export Data Link for SIBA Management Team */}
+          <div className="pt-2">
+            <button
+              onClick={() => setShowAdminModal(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-slate-400 hover:text-emerald-700 hover:bg-emerald-50 text-[11px] font-medium transition-colors cursor-pointer"
+            >
+              <Database className="w-3.5 h-3.5" />
+              <span>Dành cho Cán bộ Quản lý SIBA • Xem & Xuất Dữ Liệu Khảo Sát</span>
+            </button>
+          </div>
         </footer>
+
+        {/* Admin Submissions Modal */}
+        <AdminSubmissionsModal
+          isOpen={showAdminModal}
+          onClose={() => setShowAdminModal(false)}
+        />
 
       </main>
     </div>
