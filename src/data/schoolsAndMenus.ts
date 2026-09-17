@@ -1,4 +1,4 @@
-import { School, DayMenuItem, MenuGroup } from '../types';
+import { School, DayMenuItem, MenuGroup, WeekDefinition, WeekId } from '../types';
 
 export const COMPANY_INFO = {
   name: 'CÔNG TY CỔ PHẦN CƠM NGON SIBA',
@@ -220,9 +220,221 @@ export function getMenuByGroup(group: MenuGroup): DayMenuItem[] {
   return MENU_AN_KHANH;
 }
 
+// ==========================================
+// DANH SÁCH CÁC TUẦN KHẢO SÁT THỰC ĐƠN
+// ==========================================
+export const WEEKS_LIST: WeekDefinition[] = [
+  {
+    id: 'tuan_1',
+    name: 'Tuần 1',
+    dateRange: '14/09 – 18/09/2026',
+    startDateStr: '14/09/2026',
+    endDateStr: '18/09/2026',
+    isUniversal: false,
+    note: 'Thực đơn phân theo nhóm trường (Khu vực An Thượng & An Khánh / Khu vực Đa Phúc)',
+  },
+  {
+    id: 'tuan_2',
+    name: 'Tuần 2',
+    dateRange: '21/09 – 25/09/2026',
+    startDateStr: '21/09/2026',
+    endDateStr: '25/09/2026',
+    isUniversal: true,
+    note: 'Áp dụng chung đồng nhất cho tất cả các điểm trường',
+  },
+  {
+    id: 'tuan_3',
+    name: 'Tuần 3',
+    dateRange: '28/09 – 02/10/2026',
+    startDateStr: '28/09/2026',
+    endDateStr: '02/10/2026',
+    isUniversal: true,
+    note: 'Áp dụng chung đồng nhất cho tất cả các điểm trường',
+  },
+];
+
+// ==========================================
+// THỰC ĐƠN TUẦN 2 (21–25/09/2026)
+// Áp dụng chung cho tất cả các điểm trường
+// ==========================================
+export const MENU_TUAN_2: DayMenuItem[] = [
+  {
+    dayId: 'thu_2',
+    dayName: 'Thứ 2',
+    dateStr: '21/09/2026',
+    mainDish: 'Thịt kho tàu',
+    mainDishPortion: '80g',
+    sideDish: 'Xúc xích xào rau củ',
+    sideDishPortion: '30g+30g',
+    vegDish: 'Bắp cải cà rốt xào',
+    vegDishPortion: '70g',
+    soupDish: 'Canh mướp tôm bằm (40g+5g)',
+    ricePortion: 'Cơm trắng 220g',
+    dessert: '',
+  },
+  {
+    dayId: 'thu_3',
+    dayName: 'Thứ 3',
+    dateStr: '22/09/2026',
+    mainDish: 'Cánh gà chiên mắm',
+    mainDishPortion: '110g',
+    sideDish: 'Mọc viên sốt cà chua',
+    sideDishPortion: '60g',
+    vegDish: 'Cải thảo luộc',
+    vegDishPortion: '70g',
+    soupDish: 'Canh bí xanh thịt bằm (40g+5g)',
+    ricePortion: 'Cơm trắng 220g',
+    dessert: '',
+  },
+  {
+    dayId: 'thu_4',
+    dayName: 'Thứ 4',
+    dateStr: '23/09/2026',
+    mainDish: 'Tôm rảo rim thịt',
+    mainDishPortion: '35g+35g',
+    sideDish: 'Đậu hũ tẩm hành chiên giòn',
+    sideDishPortion: '60g',
+    vegDish: 'Rau muống xào',
+    vegDishPortion: '70g',
+    soupDish: 'Canh bắp cải tôm bằm (40g+5g)',
+    ricePortion: 'Cơm trắng 220g',
+    dessert: '',
+  },
+  {
+    dayId: 'thu_5',
+    dayName: 'Thứ 5',
+    dateStr: '24/09/2026',
+    mainDish: 'Gà phi lê xào rau củ',
+    mainDishPortion: '45g+35g',
+    sideDish: 'Thịt bằm rim mặn',
+    sideDishPortion: '60g',
+    vegDish: 'Bầu luộc',
+    vegDishPortion: '70g',
+    soupDish: 'Canh bí đỏ thịt băm (40g+5g)',
+    ricePortion: 'Cơm trắng 220g',
+    dessert: '',
+  },
+  {
+    dayId: 'thu_6',
+    dayName: 'Thứ 6',
+    dateStr: '25/09/2026',
+    mainDish: 'Bò băm sốt cà chua',
+    mainDishPortion: '60g',
+    sideDish: 'Trứng đúc thịt bằm',
+    sideDishPortion: '60g',
+    vegDish: 'Su su cà rốt xào',
+    vegDishPortion: '70g',
+    soupDish: 'Canh cải ngọt thịt bằm (40g+5g)',
+    ricePortion: 'Cơm trắng 220g',
+    dessert: '',
+  },
+];
+
+// ==========================================
+// THỰC ĐƠN TUẦN 3 (28/09–02/10/2026)
+// Áp dụng chung cho tất cả các điểm trường
+// ==========================================
+export const MENU_TUAN_3: DayMenuItem[] = [
+  {
+    dayId: 'thu_2',
+    dayName: 'Thứ 2',
+    dateStr: '28/09/2026',
+    mainDish: 'Thịt tẩm bột chiên',
+    mainDishPortion: '80g',
+    sideDish: 'Trứng luộc chiên sốt cà',
+    sideDishPortion: '60g',
+    vegDish: 'Rau muống xào',
+    vegDishPortion: '70g',
+    soupDish: 'Canh bí đao thịt bằm (40g+5g)',
+    ricePortion: 'Cơm trắng 220g',
+    dessert: '',
+  },
+  {
+    dayId: 'thu_3',
+    dayName: 'Thứ 3',
+    dateStr: '29/09/2026',
+    mainDish: 'Má gà roti',
+    mainDishPortion: '70g',
+    sideDish: 'Bò xay xào khoai tây',
+    sideDishPortion: '25g+45g',
+    vegDish: 'Bầu luộc',
+    vegDishPortion: '70g',
+    soupDish: 'Canh mồng tơi tôm bằm (40g+5g)',
+    ricePortion: 'Cơm trắng 220g',
+    dessert: '',
+  },
+  {
+    dayId: 'thu_4',
+    dayName: 'Thứ 4',
+    dateStr: '30/09/2026',
+    mainDish: 'Tôm rim mặn ngọt',
+    mainDishPortion: '55g',
+    sideDish: 'Thịt băm xào củ quả',
+    sideDishPortion: '40g+30g',
+    vegDish: 'Su su cà rốt xào tỏi',
+    vegDishPortion: '70g',
+    soupDish: 'Canh rau ngót thịt bằm (40g+5g)',
+    ricePortion: 'Cơm trắng 220g',
+    dessert: '',
+  },
+  {
+    dayId: 'thu_5',
+    dayName: 'Thứ 5',
+    dateStr: '01/10/2026',
+    mainDish: 'Thịt heo kho rau củ',
+    mainDishPortion: '45g+35g',
+    sideDish: 'Đậu hũ xốt tứ xuyên',
+    sideDishPortion: '60g',
+    vegDish: 'Bắp cải cà rốt xào',
+    vegDishPortion: '70g',
+    soupDish: 'Canh bí đỏ thịt băm (40g+5g)',
+    ricePortion: 'Cơm trắng 220g',
+    dessert: '',
+  },
+  {
+    dayId: 'thu_6',
+    dayName: 'Thứ 6',
+    dateStr: '02/10/2026',
+    mainDish: 'Cá rô phi chiên bột xù',
+    mainDishPortion: '80g',
+    sideDish: 'Trứng hấp thịt',
+    sideDishPortion: '60g',
+    vegDish: 'Đậu cove cà rốt xào',
+    vegDishPortion: '70g',
+    soupDish: 'Canh bắp cải tôm bằm (40g+5g)',
+    ricePortion: 'Cơm trắng 220g',
+    dessert: '',
+  },
+];
+
+export function getWeekById(weekId: string): WeekDefinition {
+  return WEEKS_LIST.find((w) => w.id === weekId) || WEEKS_LIST[0];
+}
+
+export function getMenuByWeekAndGroup(weekId: WeekId, group: MenuGroup): DayMenuItem[] {
+  if (weekId === 'tuan_2') {
+    return MENU_TUAN_2;
+  }
+  if (weekId === 'tuan_3') {
+    return MENU_TUAN_3;
+  }
+  // tuan_1
+  return getMenuByGroup(group);
+}
+
 export function getGroupName(group: MenuGroup): string {
   if (group === 'da_phuc') {
     return 'Thực đơn Xã Đa Phúc (Định lượng cơm 240g, Món phụ Thứ 5: Thịt băm rim chua ngọt, Có tráng miệng)';
   }
   return 'Thực đơn Xã An Khánh & An Thượng (Định lượng cơm 220g, Món phụ Thứ 5: Khoai tây xào thịt băm, Không có tráng miệng)';
+}
+
+export function getMenuDescription(weekId: WeekId, group: MenuGroup): string {
+  if (weekId === 'tuan_2') {
+    return 'Thực đơn Tuần 2 (21–25/09/2026) • Áp dụng chung đồng nhất cho tất cả các điểm trường (Cơm trắng 220g)';
+  }
+  if (weekId === 'tuan_3') {
+    return 'Thực đơn Tuần 3 (28/09–02/10/2026) • Áp dụng chung đồng nhất cho tất cả các điểm trường (Cơm trắng 220g)';
+  }
+  return getGroupName(group);
 }

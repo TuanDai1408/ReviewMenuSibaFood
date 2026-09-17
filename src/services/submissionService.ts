@@ -1,4 +1,5 @@
 import { SurveySubmission } from '../types';
+import { INITIAL_SAMPLE_SUBMISSIONS } from '../data/sampleSubmissions';
 
 const DEFAULT_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxed7UIZA_Eyu377tU4P7_Ffjpsrhwgh68qIBlAUvTzfe-Hrbr9n8CH6_ofBQBWzLmV/exec';
 const STORAGE_KEY = 'siba_survey_submissions';
@@ -26,11 +27,14 @@ export function saveWebhookUrl(url: string): void {
 export function getSavedSubmissions(): SurveySubmission[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
+    if (!raw) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_SAMPLE_SUBMISSIONS));
+      return INITIAL_SAMPLE_SUBMISSIONS;
+    }
     return JSON.parse(raw);
   } catch (err) {
     console.error('Failed to parse saved submissions', err);
-    return [];
+    return INITIAL_SAMPLE_SUBMISSIONS;
   }
 }
 
@@ -62,6 +66,8 @@ export async function sendSubmissionToWebhook(submission: SurveySubmission): Pro
     const payload = {
       id: submission.id,
       submittedAt: submission.submittedAt,
+      weekName: submission.weekName || '',
+      weekId: submission.weekId || '',
       evaluatorName: submission.evaluatorName,
       evaluatorType: submission.evaluatorType === 'phu_huynh' 
         ? 'Phụ huynh' 
@@ -123,6 +129,7 @@ export function exportSubmissionsToCSV(): void {
   const headers = [
     'Mã phiếu',
     'Thời gian gửi',
+    'Tuần thực đơn',
     'Người đánh giá',
     'Đối tượng',
     'Điểm trường',
@@ -157,6 +164,7 @@ export function exportSubmissionsToCSV(): void {
   const rows = submissions.map(s => [
     `"${s.id}"`,
     `"${s.submittedAt}"`,
+    `"${s.weekName || ''}"`,
     `"${s.evaluatorName}"`,
     `"${s.evaluatorType === 'phu_huynh' ? 'Phụ huynh' : s.evaluatorType === 'giao_vien' ? 'Giáo viên/BGH' : 'Khác'}"`,
     `"${s.schoolName}"`,

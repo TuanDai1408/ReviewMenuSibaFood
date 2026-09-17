@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Utensils, 
   Send, 
@@ -13,7 +13,14 @@ import {
   Mail,
   ShieldCheck,
   ChevronDown,
-  Loader2
+  Loader2,
+  BarChart3,
+  ClipboardList,
+  Lock,
+  UserCheck,
+  LogOut,
+  ArrowRight,
+  ArrowLeft
 } from 'lucide-react';
 import { HeaderBanner } from './components/HeaderBanner';
 import { SchoolFilterBar } from './components/SchoolFilterBar';
@@ -21,20 +28,48 @@ import { GeneralInfoStep } from './components/GeneralInfoStep';
 import { WeeklyMenuTable } from './components/WeeklyMenuTable';
 import { DayFeedbackCard } from './components/DayFeedbackCard';
 import { SuccessView } from './components/SuccessView';
+import { GoogleLoginModal } from './components/GoogleLoginModal';
+import { PendingApprovalView } from './components/PendingApprovalView';
+import { AnalyticsDashboard } from './components/AnalyticsDashboard';
 import { 
   SCHOOLS_LIST, 
   COMPANY_INFO, 
   getMenuByGroup, 
-  getGroupName 
+  getGroupName,
+  WEEKS_LIST,
+  getWeekById,
+  getMenuByWeekAndGroup,
+  getMenuDescription,
 } from './data/schoolsAndMenus';
-import { DayFeedback, OpinionType, SurveySubmission } from './types';
-import { sendSubmissionToWebhook } from './services/submissionService';
+import { DayFeedback, OpinionType, SurveySubmission, WeekId, AuthUser } from './types';
+import { sendSubmissionToWebhook, getSavedSubmissions } from './services/submissionService';
+import { getCurrentUser, logout as authLogout, ADMIN_EMAIL } from './services/authService';
 
 export default function App() {
+  // Navigation Tab State: 'survey' (public) or 'dashboard' (authenticated & approved)
+  const [activeTab, setActiveTab] = useState<'survey' | 'dashboard'>('survey');
+
+  // Auth State
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(() => getCurrentUser());
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
+  // Submissions State for Dashboard
+  const [submissions, setSubmissions] = useState<SurveySubmission[]>(() => getSavedSubmissions());
+
+  const handleRefreshSubmissions = () => {
+    setSubmissions(getSavedSubmissions());
+    setCurrentUser(getCurrentUser());
+  };
+
+  useEffect(() => {
+    setCurrentUser(getCurrentUser());
+  }, []);
+
   // Form State
   const [evaluatorType, setEvaluatorType] = useState<'phu_huynh' | 'giao_vien' | 'khac'>('phu_huynh');
   const [fullName, setFullName] = useState('');
   const [selectedSchoolId, setSelectedSchoolId] = useState('an_thuong'); // Default to An Thuong to showcase menu immediately
+  const [selectedWeekId, setSelectedWeekId] = useState<WeekId>('tuan_2'); // Default to Tuần 2 (21/09 – 25/09/2026)
   const [studentClass, setStudentClass] = useState('');
   const [phone, setPhone] = useState('');
 
@@ -54,15 +89,20 @@ export default function App() {
   const [validationError, setValidationError] = useState('');
   const [showTableModal, setShowTableModal] = useState(false);
 
-  // Selected School & Dynamic Menu
+  // Selected School
   const selectedSchool = useMemo(() => {
     return SCHOOLS_LIST.find((s) => s.id === selectedSchoolId) || SCHOOLS_LIST[0];
   }, [selectedSchoolId]);
 
-  // Current menu according to school selection
+  // Selected Week
+  const currentWeek = useMemo(() => {
+    return getWeekById(selectedWeekId);
+  }, [selectedWeekId]);
+
+  // Current menu according to week and school selection
   const currentMenu = useMemo(() => {
-    return getMenuByGroup(selectedSchool.menuGroup);
-  }, [selectedSchool]);
+    return getMenuByWeekAndGroup(selectedWeekId, selectedSchool.menuGroup);
+  }, [selectedWeekId, selectedSchool]);
 
   // Change opinion for a day
   const handleOpinionChange = (dayId: string, opinion: OpinionType) => {
@@ -155,6 +195,8 @@ export default function App() {
         month: '2-digit',
         year: 'numeric',
       }),
+      weekId: currentWeek.id,
+      weekName: `${currentWeek.name} (${currentWeek.dateRange})`,
       evaluatorType,
       evaluatorName: fullName.trim(),
       schoolId: selectedSchool.id,
@@ -169,6 +211,7 @@ export default function App() {
     try {
       // Save locally and send to Google Sheets webhook if configured
       await sendSubmissionToWebhook(newSubmission);
+      setSubmissions(getSavedSubmissions());
     } catch (error) {
       console.warn('Submission persistence warning:', error);
     } finally {
@@ -191,18 +234,44 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Handle Tab Switch to Dashboard - opens Google Sign-In modal if not logged in
+  const handleOpenDashboard = () => {
+    if (!currentUser) {
+      setShowLoginModal(true);
+    } else {
+      setActiveTab('dashboard');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleLoginSuccess = (user: AuthUser) => {
+    setCurrentUser(user);
+    setShowLoginModal(false);
+    setActiveTab('dashboard');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleLogout = () => {
+    authLogout();
+    setCurrentUser(null);
+    setActiveTab('survey');
+  };
+
   return (
-    <div className="min-h-screen bg-[#f0fdf4] text-slate-700 py-6 sm:py-10 px-3 sm:px-6 lg:px-8">
-      <main className="max-w-4xl mx-auto space-y-8">
+    <div className="min-h-screen bg-[#f0fdf4] text-slate-700 py-4 sm:py-8 px-3 sm:px-6 lg:px-8">
+      <main className="max-w-5xl mx-auto space-y-6">
         
-        {/* Header & Corporate Banner */}
-        <HeaderBanner />
+        {/* FORM KHẢO SÁT THỰC ĐƠN (CÔNG KHAI) */}
+        {activeTab === 'survey' && (
+          <div className="space-y-6">
+            {/* Header & Corporate Banner */}
+            <HeaderBanner />
 
         {isSubmitted && submissionData ? (
           <SuccessView submission={submissionData} onReset={handleReset} />
         ) : (
           <div className="space-y-6">
-            {/* Bộ lọc điểm trường đặt lên trước phần Xem bảng thực đơn */}
+            {/* Bộ lọc điểm trường & tuần thực đơn đặt lên trước phần Xem bảng thực đơn */}
             <SchoolFilterBar
               selectedSchoolId={selectedSchoolId}
               onSelectSchool={(id) => {
@@ -210,6 +279,12 @@ export default function App() {
                 setValidationError('');
               }}
               selectedSchool={selectedSchool}
+              selectedWeekId={selectedWeekId}
+              onSelectWeek={(weekId) => {
+                setSelectedWeekId(weekId);
+                setValidationError('');
+              }}
+              currentWeek={currentWeek}
             />
 
             <div className="bg-white shadow-xl rounded-3xl overflow-hidden border border-slate-200/80">
@@ -222,13 +297,13 @@ export default function App() {
                   </div>
                   <div>
                     <div className="text-xs uppercase tracking-wider font-extrabold text-emerald-800">
-                      Thực Đơn Tự Động Đồng Bộ Theo Điểm Trường
+                      Đang Xem Thực Đơn: {currentWeek.name} ({currentWeek.dateRange})
                     </div>
                     <div className="text-sm font-bold text-slate-800">
-                      {selectedSchool ? `${selectedSchool.name}` : 'Chưa chọn trường'}
+                      {currentWeek.isUniversal ? 'Áp dụng chung đồng bộ cho tất cả các điểm trường' : selectedSchool?.name}
                     </div>
                     <div className="text-xs text-slate-500">
-                      {selectedSchool && getGroupName(selectedSchool.menuGroup)}
+                      {getMenuDescription(selectedWeekId, selectedSchool.menuGroup)}
                     </div>
                   </div>
                 </div>
@@ -240,7 +315,7 @@ export default function App() {
                   className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-emerald-300 text-emerald-800 text-xs sm:text-sm font-semibold hover:bg-emerald-50 transition-all shadow-xs cursor-pointer"
                 >
                   <TableProperties className="w-4 h-4 text-emerald-600" />
-                  <span>{showTableModal ? 'Ẩn bảng thực đơn' : 'Xem bảng thực đơn tuần'}</span>
+                  <span>{showTableModal ? 'Ẩn bảng thực đơn' : `Xem bảng thực đơn ${currentWeek.name}`}</span>
                 </button>
               </div>
 
@@ -250,6 +325,7 @@ export default function App() {
                   <WeeklyMenuTable 
                     menuItems={currentMenu} 
                     selectedSchool={selectedSchool}
+                    currentWeek={currentWeek}
                   />
                 </div>
               )}
@@ -281,10 +357,10 @@ export default function App() {
                     </div>
                     <div>
                       <h2 className="text-xl font-bold text-slate-800">
-                        Đánh giá chi tiết thực đơn tuần
+                        Đánh giá chi tiết thực đơn {currentWeek.name}
                       </h2>
                       <p className="text-xs sm:text-sm text-slate-500">
-                        Tuần 2 (Từ 14/09 đến 18/09) - Buổi trưa chính
+                        {currentWeek.name} ({currentWeek.dateRange}) - Suất ăn trưa tiểu học
                       </p>
                     </div>
                   </div>
@@ -392,24 +468,113 @@ export default function App() {
           </div>
         </div>
         )}
+      </div>
+      )}
 
-        {/* Footer with exact Company Name and Registered Office */}
-        <footer className="text-center text-xs text-slate-500 space-y-2 py-4 border-t border-slate-200/60">
-          <p className="font-extrabold text-slate-700 text-sm tracking-wide">
-            {COMPANY_INFO.name}
-          </p>
-          <p className="flex items-center justify-center gap-1 text-slate-600">
-            <MapPin className="w-3.5 h-3.5 text-slate-400" />
-            <span>Trụ sở: {COMPANY_INFO.headquarters}</span>
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 text-slate-500 pt-1">
-            <span>Hotline hỗ trợ: {COMPANY_INFO.hotline}</span>
-            <span>•</span>
-            <span>Email: {COMPANY_INFO.email}</span>
-            <span>•</span>
-            <span>Bản quyền © 2026 SIBA Bán Trú Học Đường</span>
+      {/* TAB 2: DASHBOARD BÁO CÁO & PHÂN TÍCH (BẢO MẬT BẰNG GOOGLE AUTH & DUYỆT QUYỀN) */}
+      {activeTab === 'dashboard' && (
+        <div className="space-y-4">
+          {/* Thanh điều hướng quay lại khảo sát khi ở màn hình Dashboard */}
+          <div className="bg-white/95 backdrop-blur-md rounded-2xl border border-emerald-200/90 shadow-sm p-3 flex items-center justify-between gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab('survey');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="inline-flex items-center gap-2 py-2 px-3.5 sm:px-4 rounded-xl border border-slate-200 bg-slate-50 hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-800 text-slate-700 text-xs font-extrabold transition-all cursor-pointer shadow-2xs"
+            >
+              <ArrowLeft className="w-4 h-4 text-emerald-600" />
+              <span>Quay lại Biểu mẫu Khảo sát</span>
+            </button>
+
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-slate-500 hidden sm:inline">
+                Khu vực Quản trị & Báo cáo
+              </span>
+              {currentUser && (
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="inline-flex items-center gap-1.5 py-1.5 px-3 rounded-xl border border-slate-200 text-slate-500 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50 text-xs font-semibold transition-colors cursor-pointer"
+                  title="Đăng xuất"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Đăng xuất</span>
+                </button>
+              )}
+            </div>
           </div>
-        </footer>
+
+          {!currentUser ? (
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-md p-8 sm:p-12 text-center max-w-lg mx-auto space-y-5">
+              <div className="w-16 h-16 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto border border-amber-200">
+                <Lock className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900">
+                Yêu Cầu Đăng Nhập Google
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
+                Để bảo mật dữ liệu học đường, mục Báo cáo & Phân tích chuyên sâu chỉ dành cho tài khoản được Quản trị viên (<strong>{ADMIN_EMAIL}</strong>) xét duyệt.
+              </p>
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowLoginModal(true)}
+                  className="w-full py-3.5 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm flex items-center justify-center gap-2.5 shadow-md cursor-pointer transition-all"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                  </svg>
+                  <span>Đăng nhập bằng tài khoản Google</span>
+                </button>
+              </div>
+            </div>
+          ) : currentUser.status === 'pending' || currentUser.status === 'rejected' ? (
+            <PendingApprovalView
+              currentUser={currentUser}
+              onRefresh={handleRefreshSubmissions}
+              onGoToSurvey={() => setActiveTab('survey')}
+              onLogout={handleLogout}
+            />
+          ) : (
+            <AnalyticsDashboard
+              currentUser={currentUser}
+              submissions={submissions}
+              onRefreshSubmissions={handleRefreshSubmissions}
+              onLogout={handleLogout}
+            />
+          )}
+        </div>
+      )}
+
+      {/* Google Authentication Modal */}
+      <GoogleLoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        onLoginSuccess={handleLoginSuccess}
+      />
+
+      {/* Footer with exact Company Name and Registered Office */}
+      <footer className="text-center text-xs text-slate-500 space-y-2 py-6 border-t border-slate-200/70 mt-8">
+        <p className="font-extrabold text-slate-700 text-sm tracking-wide">
+          {COMPANY_INFO.name}
+        </p>
+        <p className="flex items-center justify-center gap-1 text-slate-600">
+          <MapPin className="w-3.5 h-3.5 text-slate-400" />
+          <span>Trụ sở: {COMPANY_INFO.headquarters}</span>
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 text-slate-500 pt-1">
+          <span>Hotline hỗ trợ: {COMPANY_INFO.hotline}</span>
+          <span>•</span>
+          <span>Email: {COMPANY_INFO.email}</span>
+          <span>•</span>
+          <span>Bản quyền © 2026 SIBA Bán Trú Học Đường</span>
+        </div>
+      </footer>
 
       </main>
     </div>

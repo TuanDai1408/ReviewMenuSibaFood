@@ -57,6 +57,11 @@ export const SuccessView: React.FC<SuccessViewProps> = ({
           </div>
 
           <div className="flex justify-between">
+            <span className="text-slate-500">Tuần thực đơn:</span>
+            <span className="font-semibold text-emerald-800 text-right">{submission.weekName}</span>
+          </div>
+
+          <div className="flex justify-between">
             <span className="text-slate-500">Điểm trường:</span>
             <span className="font-semibold text-emerald-800 text-right">{submission.schoolName}</span>
           </div>

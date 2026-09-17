@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { Calendar, Apple, Soup, UtensilsCrossed, ChevronLeft, ChevronRight, LayoutGrid, Table } from 'lucide-react';
-import { DayMenuItem, School } from '../types';
+import { DayMenuItem, School, WeekDefinition } from '../types';
 
 interface WeeklyMenuTableProps {
   menuItems: DayMenuItem[];
   selectedSchool?: School;
+  currentWeek?: WeekDefinition;
 }
 
 export const WeeklyMenuTable: React.FC<WeeklyMenuTableProps> = ({
   menuItems,
   selectedSchool,
+  currentWeek,
 }) => {
   const [activeDayTab, setActiveDayTab] = useState<string>(menuItems[0]?.dayId || 'thu_2');
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
@@ -25,12 +27,16 @@ export const WeeklyMenuTable: React.FC<WeeklyMenuTableProps> = ({
           <Calendar className="w-5 h-5 text-emerald-200 shrink-0" />
           <div>
             <h3 className="font-bold text-base sm:text-lg leading-tight">
-              Bảng Tổng Hợp Thực Đơn Bán Trú
+              Bảng Tổng Hợp Thực Đơn Bán Trú {currentWeek ? `• ${currentWeek.name} (${currentWeek.dateRange})` : ''}
             </h3>
             <p className="text-xs text-emerald-100 mt-0.5">
-              {selectedSchool 
-                ? `Áp dụng tại: ${selectedSchool.name} (${selectedSchool.groupLabel})`
-                : 'Thực đơn chi tiết theo định lượng tiêu chuẩn SIBA'}
+              {currentWeek?.isUniversal ? (
+                <span>Áp dụng chung đồng nhất cho toàn bộ các điểm trường • {selectedSchool?.name || ''}</span>
+              ) : selectedSchool ? (
+                `Áp dụng tại: ${selectedSchool.name} (${selectedSchool.groupLabel})`
+              ) : (
+                'Thực đơn chi tiết theo định lượng tiêu chuẩn SIBA'
+              )}
             </p>
           </div>
         </div>
@@ -290,12 +296,12 @@ export const WeeklyMenuTable: React.FC<WeeklyMenuTableProps> = ({
         </div>
       )}
 
-      {/* Table Footer - Bỏ câu disclaimer theo yêu cầu người dùng */}
-      <div className="p-3 bg-slate-50 border-t border-slate-100 text-[12px] text-slate-500 flex items-center justify-between">
-        <span className="text-slate-500 font-medium">
-          Thực đơn áp dụng tại các bếp bán trú Cơm Ngon SIBA
+      {/* Table Footer */}
+      <div className="p-3.5 bg-slate-50 border-t border-slate-100 text-[12px] text-slate-500 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+        <span className="text-slate-600 font-medium italic">
+          * Ghi chú: Ảnh minh hoạ món chính & món phụ theo ngày cần đầu bếp xác nhận.
         </span>
-        <span className="text-slate-400">Đơn vị tính: gram (g)</span>
+        <span className="text-slate-400">Đơn vị tính định lượng: gram (g)</span>
       </div>
     </div>
   );
