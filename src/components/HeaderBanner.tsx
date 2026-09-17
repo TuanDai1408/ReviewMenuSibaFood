@@ -54,7 +54,7 @@ export const HeaderBanner: React.FC = () => {
             Kính gửi Quý Phụ huynh và Ban Giám hiệu nhà trường,
           </p>
           <p className="text-slate-600 text-sm sm:text-base">
-            Để chuẩn bị chu đáo cho thực đơn bán trú tháng 9 (áp dụng từ <strong>14/09 đến 18/09</strong>), 
+            Để chuẩn bị chu đáo cho thực đơn bán trú trong thời gian sắp tới, 
             <strong> {COMPANY_INFO.name}</strong> trân trọng gửi đến Quý vị danh sách thực đơn chi tiết theo từng điểm trường. 
             Mỗi ý kiến đồng thuận hoặc đề xuất điều chỉnh của Quý vị là cơ sở quý báu để chúng tôi nâng niu từng bữa ăn, 
             đảm bảo cân bằng vi chất và hợp khẩu vị của các con học sinh.

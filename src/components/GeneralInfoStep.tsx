@@ -1,5 +1,5 @@
 import React from 'react';
-import { School2, User, BookOpen, GraduationCap, MapPin, CheckCircle2, Phone, Hash } from 'lucide-react';
+import { School2, User, BookOpen, GraduationCap, MapPin, CheckCircle2, Phone } from 'lucide-react';
 import { SCHOOLS_LIST } from '../data/schoolsAndMenus';
 import { School } from '../types';
 
@@ -110,15 +110,15 @@ export const GeneralInfoStep: React.FC<GeneralInfoProps> = ({
             <optgroup label="📍 Khu vực Xã An Thượng & Xã An Khánh">
               {SCHOOLS_LIST.filter(s => s.menuGroup === 'an_khanh').map(school => (
                 <option key={school.id} value={school.id}>
-                  {school.name} (Mã: {school.code})
+                  {school.name}
                 </option>
               ))}
             </optgroup>
 
-            <optgroup label="📍 Các phân hiệu Trường Xã Đa Phúc">
+            <optgroup label="📍 Khu vực Xã Đa Phúc">
               {SCHOOLS_LIST.filter(s => s.menuGroup === 'da_phuc').map(school => (
                 <option key={school.id} value={school.id}>
-                  {school.name} (Mã: {school.code})
+                  {school.name}
                 </option>
               ))}
             </optgroup>
@@ -132,9 +132,6 @@ export const GeneralInfoStep: React.FC<GeneralInfoProps> = ({
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span className="font-bold text-emerald-950 text-base">{selectedSchool.name}</span>
-                <span className="inline-flex items-center gap-1 text-xs bg-emerald-200/80 text-emerald-900 px-2 py-0.5 rounded-md font-mono font-medium">
-                  <Hash className="w-3 h-3" /> {selectedSchool.code}
-                </span>
               </div>
               <div className="flex items-center gap-1.5 text-xs text-slate-600">
                 <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />

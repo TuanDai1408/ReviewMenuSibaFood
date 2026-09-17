@@ -13,15 +13,14 @@ import {
   Mail,
   ShieldCheck,
   ChevronDown,
-  Database,
   Loader2
 } from 'lucide-react';
 import { HeaderBanner } from './components/HeaderBanner';
+import { SchoolFilterBar } from './components/SchoolFilterBar';
 import { GeneralInfoStep } from './components/GeneralInfoStep';
 import { WeeklyMenuTable } from './components/WeeklyMenuTable';
 import { DayFeedbackCard } from './components/DayFeedbackCard';
 import { SuccessView } from './components/SuccessView';
-import { AdminSubmissionsModal } from './components/AdminSubmissionsModal';
 import { 
   SCHOOLS_LIST, 
   COMPANY_INFO, 
@@ -54,7 +53,6 @@ export default function App() {
   const [submissionData, setSubmissionData] = useState<SurveySubmission | null>(null);
   const [validationError, setValidationError] = useState('');
   const [showTableModal, setShowTableModal] = useState(false);
-  const [showAdminModal, setShowAdminModal] = useState(false);
 
   // Selected School & Dynamic Menu
   const selectedSchool = useMemo(() => {
@@ -203,50 +201,61 @@ export default function App() {
         {isSubmitted && submissionData ? (
           <SuccessView submission={submissionData} onReset={handleReset} />
         ) : (
-          <div className="bg-white shadow-xl rounded-3xl overflow-hidden border border-slate-200/80">
-            
-            {/* Context Notice on Menu Switching */}
-            <div className="bg-emerald-50/80 border-b border-emerald-100 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-200">
-                  <Utensils className="w-5 h-5" />
+          <div className="space-y-6">
+            {/* Bộ lọc điểm trường đặt lên trước phần Xem bảng thực đơn */}
+            <SchoolFilterBar
+              selectedSchoolId={selectedSchoolId}
+              onSelectSchool={(id) => {
+                setSelectedSchoolId(id);
+                setValidationError('');
+              }}
+              selectedSchool={selectedSchool}
+            />
+
+            <div className="bg-white shadow-xl rounded-3xl overflow-hidden border border-slate-200/80">
+              
+              {/* Context Notice on Menu Switching */}
+              <div className="bg-emerald-50/80 border-b border-emerald-100 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-200">
+                    <Utensils className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="text-xs uppercase tracking-wider font-extrabold text-emerald-800">
+                      Thực Đơn Tự Động Đồng Bộ Theo Điểm Trường
+                    </div>
+                    <div className="text-sm font-bold text-slate-800">
+                      {selectedSchool ? `${selectedSchool.name}` : 'Chưa chọn trường'}
+                    </div>
+                    <div className="text-xs text-slate-500">
+                      {selectedSchool && getGroupName(selectedSchool.menuGroup)}
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <div className="text-xs uppercase tracking-wider font-extrabold text-emerald-800">
-                    Thực Đơn Tự Động Đồng Bộ Theo Điểm Trường
-                  </div>
-                  <div className="text-sm font-bold text-slate-800">
-                    {selectedSchool ? `${selectedSchool.name}` : 'Chưa chọn trường'}
-                  </div>
-                  <div className="text-xs text-slate-500">
-                    {selectedSchool && getGroupName(selectedSchool.menuGroup)}
-                  </div>
-                </div>
+
+                {/* Action: View full week spreadsheet table */}
+                <button
+                  type="button"
+                  onClick={() => setShowTableModal(!showTableModal)}
+                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-emerald-300 text-emerald-800 text-xs sm:text-sm font-semibold hover:bg-emerald-50 transition-all shadow-xs cursor-pointer"
+                >
+                  <TableProperties className="w-4 h-4 text-emerald-600" />
+                  <span>{showTableModal ? 'Ẩn bảng thực đơn' : 'Xem bảng thực đơn tuần'}</span>
+                </button>
               </div>
 
-              {/* Action: View full week spreadsheet table */}
-              <button
-                type="button"
-                onClick={() => setShowTableModal(!showTableModal)}
-                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-emerald-300 text-emerald-800 text-xs sm:text-sm font-semibold hover:bg-emerald-50 transition-all shadow-xs cursor-pointer"
-              >
-                <TableProperties className="w-4 h-4 text-emerald-600" />
-                <span>{showTableModal ? 'Ẩn bảng tổng hợp' : 'Xem bảng thực đơn tuần'}</span>
-              </button>
-            </div>
+              {/* Expandable Weekly Menu Table */}
+              {showTableModal && (
+                <div className="p-4 sm:p-6 bg-slate-50 border-b border-slate-200 animate-in fade-in duration-300">
+                  <WeeklyMenuTable 
+                    menuItems={currentMenu} 
+                    selectedSchool={selectedSchool}
+                  />
+                </div>
+              )}
 
-            {/* Expandable Weekly Menu Table */}
-            {showTableModal && (
-              <div className="p-4 sm:p-6 bg-slate-50 border-b border-slate-200 animate-in fade-in duration-300">
-                <WeeklyMenuTable 
-                  menuItems={currentMenu} 
-                  selectedSchool={selectedSchool}
-                />
-              </div>
-            )}
-
-            {/* The Main Survey Form */}
-            <form onSubmit={handleSubmit} className="p-5 sm:p-8 space-y-10">
+              {/* The Main Survey Form */}
+              <form onSubmit={handleSubmit} className="p-5 sm:p-8 space-y-10">
               
               {/* Part 1: General Info & School Selection */}
               <GeneralInfoStep
@@ -381,6 +390,7 @@ export default function App() {
               </div>
             </form>
           </div>
+        </div>
         )}
 
         {/* Footer with exact Company Name and Registered Office */}
@@ -399,24 +409,7 @@ export default function App() {
             <span>•</span>
             <span>Bản quyền © 2026 SIBA Bán Trú Học Đường</span>
           </div>
-
-          {/* Admin / Export Data Link for SIBA Management Team */}
-          <div className="pt-2">
-            <button
-              onClick={() => setShowAdminModal(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-slate-400 hover:text-emerald-700 hover:bg-emerald-50 text-[11px] font-medium transition-colors cursor-pointer"
-            >
-              <Database className="w-3.5 h-3.5" />
-              <span>Dành cho Cán bộ Quản lý SIBA • Xem & Xuất Dữ Liệu Khảo Sát</span>
-            </button>
-          </div>
         </footer>
-
-        {/* Admin Submissions Modal */}
-        <AdminSubmissionsModal
-          isOpen={showAdminModal}
-          onClose={() => setShowAdminModal(false)}
-        />
 
       </main>
     </div>

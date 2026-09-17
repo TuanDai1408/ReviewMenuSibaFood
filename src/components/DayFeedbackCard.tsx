@@ -90,10 +90,12 @@ export const DayFeedbackCard: React.FC<DayFeedbackCardProps> = ({
             <span className="text-slate-500 font-medium">Cơm:</span>{' '}
             <strong className="text-slate-800">{dayMenu.ricePortion}</strong>
           </div>
-          <div className="bg-white/80 p-2 rounded-lg border border-amber-200/80 bg-amber-50/40">
-            <span className="text-amber-800 font-medium">Tráng miệng:</span>{' '}
-            <strong className="text-amber-900">{dayMenu.dessert}</strong>
-          </div>
+          {dayMenu.dessert && (
+            <div className="bg-white/80 p-2 rounded-lg border border-amber-200/80 bg-amber-50/40">
+              <span className="text-amber-800 font-medium">Tráng miệng:</span>{' '}
+              <strong className="text-amber-900">{dayMenu.dessert}</strong>
+            </div>
+          )}
         </div>
       </div>
 

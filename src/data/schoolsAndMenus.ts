@@ -5,14 +5,14 @@ export const COMPANY_INFO = {
   shortName: 'SIBA FOOD CATERING',
   brandName: 'Cơm Ngon SIBA',
   headquarters: 'Tầng 2, Tòa nhà Oxygen, 628C Võ Nguyên Giáp, Phường An Khánh, Thành Phố Hồ Chí Minh',
-  hotline: '1900 888 238',
+  hotline: '1800 6263',
   email: 'cskh@sibafood.vn',
   website: 'www.sibafood.vn',
 };
 
 // Danh sách các điểm trường theo yêu cầu người dùng:
 // 1. Menu của điểm trường An Thượng và An Khánh
-// 2. Menu của các phân hiệu trường Đa Phúc (ngoài trường An Thượng)
+// 2. Menu của các trường Đa Phúc
 export const SCHOOLS_LIST: School[] = [
   // Nhóm 1: Điểm trường An Thượng & An Khánh
   {
@@ -33,38 +33,38 @@ export const SCHOOLS_LIST: School[] = [
     groupLabel: 'Khu vực An Thượng & An Khánh',
     schoolYear: '2026–2027',
   },
-  // Nhóm 2: Các phân hiệu trường Đa Phúc
+  // Nhóm 2: Các trường Xã Đa Phúc
   {
     id: 'da_phuc_th',
     code: '2026856529',
     name: 'Trường Tiểu học Đa Phúc',
     address: 'Thôn Xuân Giang, Xã Đa Phúc, Huyện Sóc Sơn, TP Hà Nội',
     menuGroup: 'da_phuc',
-    groupLabel: 'Phân hiệu trường Đa Phúc',
+    groupLabel: 'Khu vực Đa Phúc',
     schoolYear: '2026–2027',
   },
   {
     id: 'da_phuc_chu_van_an',
     code: '2026856601',
-    name: 'Trường TH và THCS Chu Văn An (Phân hiệu Đa Phúc)',
+    name: 'Trường TH và THCS Chu Văn An',
     address: 'Thôn Ngô Đạo, Xã Đa Phúc, Huyện Sóc Sơn, TP Hà Nội',
     menuGroup: 'da_phuc',
-    groupLabel: 'Phân hiệu trường Đa Phúc',
+    groupLabel: 'Khu vực Đa Phúc',
     schoolYear: '2026–2027',
   },
   {
     id: 'da_phuc_le_quy_don',
     code: '2026856796',
-    name: 'Trường Tiểu học và THCS Lê Quý Đôn (Phân hiệu Đa Phúc)',
+    name: 'Trường Tiểu học và THCS Lê Quý Đôn',
     address: 'Thôn Bắc Phú, Xã Đa Phúc, Huyện Sóc Sơn, TP Hà Nội',
     menuGroup: 'da_phuc',
-    groupLabel: 'Phân hiệu trường Đa Phúc',
+    groupLabel: 'Khu vực Đa Phúc',
     schoolYear: '2026–2027',
   },
 ];
 
-// MENU THÁNG 9 - Xã An Khánh (Áp dụng cho điểm trường An Thượng và An Khánh)
-// Tuần 2: Từ 14/09 đến 18/09
+// MENU THÁNG 9 - Xã An Khánh (Áp dụng cho điểm trường An Thượng và An Khánh - Không có tráng miệng)
+// Áp dụng cho thời gian sắp tới
 export const MENU_AN_KHANH: DayMenuItem[] = [
   {
     dayId: 'thu_2',
@@ -78,7 +78,7 @@ export const MENU_AN_KHANH: DayMenuItem[] = [
     vegDishPortion: '70g',
     soupDish: 'Canh bí đỏ',
     ricePortion: 'Cơm trắng 220g',
-    dessert: 'Sữa trái cây',
+    dessert: '',
   },
   {
     dayId: 'thu_3',
@@ -92,7 +92,7 @@ export const MENU_AN_KHANH: DayMenuItem[] = [
     vegDishPortion: '70g',
     soupDish: 'Canh bầu',
     ricePortion: 'Cơm trắng 220g',
-    dessert: 'Bánh sandwich chà bông',
+    dessert: '',
   },
   {
     dayId: 'thu_4',
@@ -106,7 +106,7 @@ export const MENU_AN_KHANH: DayMenuItem[] = [
     vegDishPortion: '70g',
     soupDish: 'Canh mồng tơi',
     ricePortion: 'Cơm trắng 220g',
-    dessert: 'Sữa tươi Ba Vì',
+    dessert: '',
   },
   {
     dayId: 'thu_5',
@@ -120,7 +120,7 @@ export const MENU_AN_KHANH: DayMenuItem[] = [
     vegDishPortion: '70g',
     soupDish: 'Canh bí xanh',
     ricePortion: 'Cơm trắng 220g',
-    dessert: 'Sữa Kun lúa mạch',
+    dessert: '',
   },
   {
     dayId: 'thu_6',
@@ -134,7 +134,7 @@ export const MENU_AN_KHANH: DayMenuItem[] = [
     vegDishPortion: '70g',
     soupDish: 'Canh cải ngọt',
     ricePortion: 'Cơm trắng 220g',
-    dessert: 'Bánh mì nhân bơ sữa',
+    dessert: '',
   },
 ];
 
@@ -222,7 +222,7 @@ export function getMenuByGroup(group: MenuGroup): DayMenuItem[] {
 
 export function getGroupName(group: MenuGroup): string {
   if (group === 'da_phuc') {
-    return 'Thực đơn Xã Đa Phúc (Định lượng cơm 240g, Món phụ Thứ 5: Thịt băm rim chua ngọt)';
+    return 'Thực đơn Xã Đa Phúc (Định lượng cơm 240g, Món phụ Thứ 5: Thịt băm rim chua ngọt, Có tráng miệng)';
   }
-  return 'Thực đơn Xã An Khánh & An Thượng (Định lượng cơm 220g, Món phụ Thứ 5: Khoai tây xào thịt băm)';
+  return 'Thực đơn Xã An Khánh & An Thượng (Định lượng cơm 220g, Món phụ Thứ 5: Khoai tây xào thịt băm, Không có tráng miệng)';
 }
