@@ -119,8 +119,8 @@ export const INITIAL_SAMPLE_SUBMISSIONS: SurveySubmission[] = [
     studentClass: '5A1',
     phone: '0919223344',
     dayFeedbacks: {
-      thu_2: { dayId: 'thu_2', opinion: 'dong_thuan', comment: 'Thịt tẩm bột chiên giòn rụm con rất hào hứng' },
-      thu_3: { dayId: 'thu_3', opinion: 'dong_thuan', comment: 'Má gà roti đậm đà, màu đẹp mắt' },
+      thu_2: { dayId: 'thu_2', opinion: 'dong_thuan', comment: 'Má gà roti đậm đà, màu đẹp mắt, con rất hào hứng' },
+      thu_3: { dayId: 'thu_3', opinion: 'dong_thuan', comment: 'Thịt tẩm bột chiên giòn thơm vừa vặn' },
       thu_4: { dayId: 'thu_4', opinion: 'dong_thuan', comment: 'Canh rau ngót thịt bằm ngọt mát' },
       thu_5: { dayId: 'thu_5', opinion: 'doi_mon', suggestedDish: 'Đậu hũ sốt thịt băm nấm', comment: 'Đậu hũ xốt tứ xuyên nên giảm độ cay nóng đối với học sinh tiểu học' },
       thu_6: { dayId: 'thu_6', opinion: 'dong_thuan', comment: 'Cá rô phi chiên bột xù giòn, không tanh' },
