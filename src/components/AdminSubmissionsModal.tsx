@@ -91,8 +91,7 @@ export const AdminSubmissionsModal: React.FC<AdminSubmissionsModalProps> = ({
             </div>
             
             <p className="text-xs text-slate-600 mb-3 leading-relaxed">
-              Dán URL Google Apps Script Webhook của bạn vào đây. Khi phụ huynh bấm Gửi, dữ liệu sẽ tự động nhảy vào Google Sheets của bạn. 
-              (Hoặc đặt biến môi trường <code>VITE_GOOGLE_SHEETS_WEBHOOK_URL</code> trên Vercel).
+              Hệ thống đã được tích hợp sẵn URL Google Sheets Webhook chính thức của SIBA. Dữ liệu sẽ tự động đổ về bảng tính trực tuyến khi người dùng gửi phiếu đánh giá.
             </p>
 
             <form onSubmit={handleSaveWebhook} className="flex flex-col sm:flex-row gap-2">

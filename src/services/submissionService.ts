@@ -1,5 +1,6 @@
 import { SurveySubmission } from '../types';
 
+const DEFAULT_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxed7UIZA_Eyu377tU4P7_Ffjpsrhwgh68qIBlAUvTzfe-Hrbr9n8CH6_ofBQBWzLmV/exec';
 const STORAGE_KEY = 'siba_survey_submissions';
 const WEBHOOK_STORAGE_KEY = 'siba_google_sheets_webhook_url';
 
@@ -9,9 +10,13 @@ export function getWebhookUrl(): string {
   if (savedUrl && savedUrl.trim()) {
     return savedUrl.trim();
   }
-  // 2. Check VITE_GOOGLE_SHEETS_WEBHOOK_URL env variable (set on Vercel)
+  // 2. Check VITE_GOOGLE_SHEETS_WEBHOOK_URL env variable (set on Vercel) if provided
   const envObj = (import.meta as unknown as { env?: Record<string, string> }).env;
-  return envObj?.VITE_GOOGLE_SHEETS_WEBHOOK_URL || '';
+  if (envObj?.VITE_GOOGLE_SHEETS_WEBHOOK_URL && envObj.VITE_GOOGLE_SHEETS_WEBHOOK_URL.trim()) {
+    return envObj.VITE_GOOGLE_SHEETS_WEBHOOK_URL.trim();
+  }
+  // 3. Default integrated Google Apps Script URL
+  return DEFAULT_WEBHOOK_URL;
 }
 
 export function saveWebhookUrl(url: string): void {
